@@ -13,6 +13,6 @@ There are two ways to install this project :
 2. install binaries
 ## dependencies
 the dependencies of this project are :
-* Visual Studio 2022 [Link to Google](https://www.google.com)
+* [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 * Raylib graphics library
 * C++ compiler (if not using Visual Studio)
