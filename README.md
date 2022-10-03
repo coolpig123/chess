@@ -1,4 +1,5 @@
-# chess
+# chess 
+![image info](logo.png)
 
 - [About the project](#about-the-project)
 - [Installation](#installation)
