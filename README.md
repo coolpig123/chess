@@ -2,14 +2,17 @@
 ![image info](logo.png)
 - [About the project](#about-the-project)
 - [Installation](#installation)
-    - [Dependencies](#dependencies)
-
-
-# about the project
+- [Dependencies](#dependencies)
+## features
+* drag and drop mechanism for moving pieces
+* castling queen and king side
+* utility function to read FEN notation
+* files and ranks displayed
+## about the project
 ![Alt Text](Animation.gif) </br>
 The purpose of this project is to make chess comfortable for people to play on their computer. </br>
 In order to move pieces the latest version currently only uses click and drag system to move the pieces. </br>
-# installation
+## installation
 There are two ways to install this project :
 1. install project and compile on your own
 2. install binaries
