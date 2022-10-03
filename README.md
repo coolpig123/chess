@@ -6,7 +6,7 @@
 
 
 # about the project
-![Alt Text](animation.gif)
+![Alt Text](Animation.gif) </br>
 The purpose of this project is to make chess comfortable for people to play on their computer. </br>
 In order to move pieces the latest version currently only uses click and drag system to move the pieces. </br>
 # installation
