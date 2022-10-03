@@ -5,12 +5,13 @@
 - [Installation](#installation)
 - [Dependencies](#dependencies)
 ## features
-* drag and drop mechanism for moving pieces
-* castling queen and king side
-* utility function to read FEN notation
+* **drag** **and** **drop** mechanism for moving pieces
+* **castling** queen and king side
+* utility function to read **FEN** **notation**
 * files and ranks displayed
-* Written in plain C++ code (C++20) using camelCase notation
-* Hardware accelerated and used with Raylib library
+* Written in plain **C++** code (C++20) using camelCase notation
+* Hardware accelerated and used with **Raylib** library
+* **Free** and **open** **source**
 ## about the project
 ![Alt Text](Animation.gif) </br>
 The purpose of this project is to make chess comfortable for people to play on their computer. </br>
