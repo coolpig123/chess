@@ -8,7 +8,7 @@
 * castling queen and king side
 * utility function to read FEN notation
 * files and ranks displayed
-* Written in plain C++ code (C20) using camelCase notation
+* Written in plain C++ code (C++20) using camelCase notation
 ## about the project
 ![Alt Text](Animation.gif) </br>
 The purpose of this project is to make chess comfortable for people to play on their computer. </br>
