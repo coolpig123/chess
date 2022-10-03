@@ -1,6 +1,6 @@
 # chess 
 ![image info](logo.png)
-
+![Alt Text](Animation.gif)
 - [About the project](#about-the-project)
 - [Installation](#installation)
     - [Dependencies](#dependencies)
