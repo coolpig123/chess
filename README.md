@@ -1,5 +1,6 @@
 # chess 
 ![image info](logo.png)
+- [Features](#features)
 - [About the project](#about-the-project)
 - [Installation](#installation)
 - [Dependencies](#dependencies)
@@ -9,6 +10,7 @@
 * utility function to read FEN notation
 * files and ranks displayed
 * Written in plain C++ code (C++20) using camelCase notation
+* Hardware accelerated and used with Raylib library
 ## about the project
 ![Alt Text](Animation.gif) </br>
 The purpose of this project is to make chess comfortable for people to play on their computer. </br>
