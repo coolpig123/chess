@@ -1,13 +1,14 @@
 # chess 
 ![image info](logo.png)
-![Alt Text](Animation.gif)
 - [About the project](#about-the-project)
 - [Installation](#installation)
     - [Dependencies](#dependencies)
 
 
 # about the project
-The purpose of this project is to make chess comfortable for people to play on their computer.
+![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+The purpose of this project is to make chess comfortable for people to play on their computer. </br>
+In order to move pieces the latest version currently only uses click and drag system to move the pieces. </br>
 # installation
 There are two ways to install this project :
 1. install project and compile on your own
