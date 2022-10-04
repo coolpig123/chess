@@ -30,4 +30,9 @@ There are two ways to install this project :
 the dependencies of this project are :
 * [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 * [Raylib graphics library](https://www.raylib.com/)
-
+## upcoming features
+* en-passant movement
+* analysis mode
+* play against computer (stockfish mostly)
+* theme customization
+* play online against your friends
