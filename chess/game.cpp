@@ -19,7 +19,10 @@ void game::start() {
     // castlingRights[3] = can black castle queen side
     bool castlingRights[] = {true,true,true,true};
     InitWindow(screenWidth, screenHeight, "chess");
-    Texture2D pieces = LoadTexture("pieces.png");
+    InitAudioDevice();
+    Sound fxMove = LoadSound("../assets/move.mp3");         
+    Sound fxCapture = LoadSound("../assets/capture.mp3");
+    Texture2D pieces = LoadTexture("../assets/pieces.png");
     Font font = LoadFontEx("font.ttf", 640, 0, 79);
     SetTargetFPS(144);               
     char board[8][8] = { {'r','n','b','q','k','b','n','r'},
@@ -50,7 +53,7 @@ void game::start() {
             renderPieceLastPos(pieceLastPos.second, pieceLastPos.first, 100, pieceOnMouse, &pieces, board, boardX, boardY);
         EndDrawing();
 
-        if (!gameOver) movePieceToMouse(100, &pieceOnMouse, board, &pieceLastPos, &turn,boardX,boardY,castlingRights);
+        if (!gameOver) movePieceToMouse(100, &pieceOnMouse, board, &pieceLastPos, &turn,boardX,boardY,castlingRights,fxMove,fxCapture);
 
         if (isBlackMated(board,castlingRights) && !gameOver) {
             std::cout << "White won by checkmate" << std::endl;
@@ -66,6 +69,8 @@ void game::start() {
         }
     }
     CloseWindow();
+    UnloadSound(fxMove);    
+    UnloadSound(fxCapture);
     UnloadTexture(pieces);
     UnloadFont(font);
 }

@@ -2,12 +2,13 @@
 #include "utility"
 #include <vector>
 #include "string"
+#include "raylib.h"
 
 // function to get the mouse position on the board
 std::pair<int, int> getMousePosition(int cellLength, int boardX, int boardY);
 
 // function handle when user try's to move a piece
-void movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos,bool* turn,int boardX,int boardY,bool castlingRights[4]);
+void movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos,bool* turn,int boardX,int boardY,bool castlingRights[4],Sound fxMove,Sound fxCapture);
 
 // function to return if the position of the mouse is valid or invalid
 bool isMousePositionValid(int screenWidth, int screenHeight,char *pieceOnMouse);
@@ -20,7 +21,7 @@ bool isMoveValid(char piece, std::pair<int, int> pieceLastPos, std::pair<int, in
 
 // check if a letter is upper case
 bool isUpperCase(char letter);
-
+ 
 // check if a letter is lower case
 bool isLowerCase(char letter);
 
@@ -71,3 +72,6 @@ bool isDrawByStaleMate(char board[8][8]);
 
 // copy board to another board
 void copyBoard(char copyToboard[8][8], char copiedBoard[8][8]);
+
+// calculate the difference between two board (value wise)
+int calcBoardDiff(char boardOne[8][8], char boardTwo[8][8]);

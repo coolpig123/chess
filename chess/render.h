@@ -14,7 +14,7 @@ void renderMousePosition(int cellLength, int boardX, int boardY);
 // a function to render the piece that the mouse is currently dragging
 void renderPieceOnMouse(int cellLength, char piece, Texture2D* pieces);
 
-// render possible moves
+// a function to render the possible moves a piece can play
 void renderPossibleMoves(std::pair<int,int> position,char piece,char board[8][8], int cellLength, int boardX, int boardY,char pieceOnMouse, bool castlingRights[4]);
 
 // render border of board

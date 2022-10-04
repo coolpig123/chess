@@ -34,7 +34,7 @@ std::pair<int, int> getMousePosition(int cellLength,int boardX,int boardY) {
 	}
 	return position;
 }
-void movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos, bool* turn,int boardX,int boardY, bool castlingRights[4]) {
+void movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos, bool* turn,int boardX,int boardY, bool castlingRights[4], Sound fxMove, Sound fxCapture) {
 	bool isPieceOnMouse = (*pieceOnMouse != ' '); // check if there is a piece on the mouse
 	char boardAfter[8][8];
 	bool isMoveVal = isMoveValid(*pieceOnMouse, *pieceLastPos, std::make_pair(getMousePosition(cellLength, boardX, boardY).second, getMousePosition(cellLength, boardX, boardY).first), board,castlingRights);
@@ -55,6 +55,19 @@ void movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std:
 	else if (isPieceOnMouse && IsMouseButtonUp(MOUSE_BUTTON_LEFT) && isMousePosValid
 		&& isMoveVal && (!isSideChecked(*pieceOnMouse, boardAfter,castlingRights) || (getMousePosition(cellLength, boardX, boardY).second == pieceLastPos->first && getMousePosition(cellLength, boardX, boardY).first == pieceLastPos->second)) &&
 		((isLowerCase(*pieceOnMouse) && *turn == false) || (isUpperCase(*pieceOnMouse) && *turn == true))) {
+
+		boardAfter[pieceLastPos->first][pieceLastPos->second] = ' ';
+		char newBoard[8][8];
+		copyBoard(newBoard, board);
+		newBoard[pieceLastPos->first][pieceLastPos->second] = *pieceOnMouse;
+		if (calcBoardDiff(newBoard, boardAfter) != 0) {
+
+			PlaySound(fxCapture);
+		}
+		else {
+			PlaySound(fxMove);
+		}
+
 		if ((*pieceOnMouse == 'K' && pieceLastPos->second + 2 == getMousePosition(cellLength, boardX, boardY).first)) {
 			castlingRights[0] = false;
 			castlingRights[1] = false;
@@ -319,7 +332,8 @@ bool isBlackMated(char board[8][8], bool castlingRights[4]) {
 						copyBoard(boardAfter, board);
 						boardAfter[a][b] = board[i][j];
 						boardAfter[i][j] = ' ';
-						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights) && !iskChecked(boardAfter, castlingRights)) {
+						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights) && 
+							!iskChecked(boardAfter, castlingRights)) {
 							return false;
 						}
 					}
@@ -340,7 +354,8 @@ bool isWhiteMated(char board[8][8],bool castlingRights[4]) {
 						copyBoard(boardAfter, board);
 						boardAfter[a][b] = board[i][j];
 						boardAfter[i][j] = ' ';
-						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights) && !isKChecked(boardAfter, castlingRights)) {
+						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights) && 
+							!isKChecked(boardAfter, castlingRights)) {
 							return false;
 						}
 					}
@@ -465,4 +480,17 @@ void copyBoard(char copyToboard[8][8], char copiedBoard[8][8]) {
 			copyToboard[i][j] = copiedBoard[i][j];
 		}
 	}
+}
+
+int calcBoardDiff(char boardOne[8][8], char boardTwo[8][8]) {
+	int boardOneSum = 0;
+	int boardTwoSum = 0;
+	std::map<char, int> values = { {'k',0},{'q',9}, {'p',1}, {'r',5}, {'n',3}, {'b',3}, {' ',0} };
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			boardOneSum += values[char(std::tolower(boardOne[i][j]))];
+			boardTwoSum += values[char(std::tolower(boardTwo[i][j]))];
+		}
+	}
+	return abs(boardOneSum - boardTwoSum);
 }

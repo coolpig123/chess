@@ -1,5 +1,5 @@
 # chess 
-![image info](logo.png) </br>
+![image info](assets/logo.png) </br>
 [![Github Repo Size](https://img.shields.io/github/repo-size/coolpig123/chess)](https://github.com/coolpig123/chess)
 [![Github Issues](https://img.shields.io/github/issues-raw/coolpig123/chess)](https://github.com/coolpig123/chess/issues)
 [![Github License](https://img.shields.io/github/license/coolpig123/chess)](https://github.com/coolpig123/chess/blob/master/LICENSE.txt)
@@ -10,6 +10,7 @@
 - [About the project](#about-the-project)
 - [Installation](#installation)
 - [Dependencies](#dependencies)
+- [Upcoming features](#upcoming-features)
 ## features
 * **drag** **and** **drop** mechanism for moving pieces
 * **castling** queen and king side
@@ -19,7 +20,7 @@
 * Hardware accelerated and used with **Raylib** library
 * **Free** and **open** **source**
 ## about the project
-![Alt Text](Animation.gif) </br>
+![Alt Text](assets/Animation.gif) </br>
 The purpose of this project is to make chess comfortable for people to play on their computer. </br>
 In order to move pieces the latest version currently only uses click and drag system to move the pieces. </br>
 ## installation
