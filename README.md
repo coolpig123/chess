@@ -11,6 +11,7 @@
 - [Installation](#installation)
 - [Dependencies](#dependencies)
 - [Upcoming features](#upcoming-features)
+- [Files](#files)
 ## features
 * **drag** **and** **drop** mechanism for moving pieces
 * **castling** queen and king side
@@ -37,3 +38,9 @@ the dependencies of this project are :
 * play against computer (stockfish mostly)
 * theme customization
 * play online against your friends
+## files
+* assets - folder containing the assets
+* chess - folder containing all the source code
+* setup - folder containing setup vs project
+* README.md - readme file
+* chess.sln - Visual Studio solution file
