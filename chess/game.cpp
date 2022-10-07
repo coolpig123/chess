@@ -9,6 +9,7 @@ void game::start() {
     const int screenHeight = 850;
     int boardX = 25;
     int boardY = 25;
+    int promotionFile = -1;
     char pieceOnMouse = ' ';
     bool turn = 1; // 1 for white, 0 for black
     bool gameOver = false;
@@ -47,23 +48,36 @@ void game::start() {
                 }
             }
             renderBorder(100, boardX, boardY,&font);
-            renderMousePosition(100,boardX,boardY);
-            renderPossibleMoves(pieceLastPos,pieceOnMouse, board, 100,boardX,boardY, pieceOnMouse,castlingRights);
-            renderPieceOnMouse(100, pieceOnMouse, &pieces);
-            renderPieceLastPos(pieceLastPos.second, pieceLastPos.first, 100, pieceOnMouse, &pieces, board, boardX, boardY);
+            renderMousePosition(100, boardX, boardY);
+            if (promotionFile == -1) {
+                renderPossibleMoves(pieceLastPos, pieceOnMouse, board, 100, boardX, boardY, pieceOnMouse, castlingRights);
+                renderPieceOnMouse(100, pieceOnMouse, &pieces);
+                renderPieceLastPos(pieceLastPos.second, pieceLastPos.first, 100, pieceOnMouse, &pieces, board, boardX, boardY);
+            }
+            else {
+                if (!turn) { 
+                    renderPromotion(boardX, boardY, 100, &pieces, promotionFile, 'P'); 
+                    promotionFile = handlePromotion('P', promotionFile, board, boardX, boardY, 100);
+                }
+                if (turn) {
+                    renderPromotion(boardX, boardY, 100, &pieces, promotionFile, 'p');
+                    promotionFile = handlePromotion('p', promotionFile, board, boardX, boardY, 100);
+                }
+            }
         EndDrawing();
 
-        if (!gameOver) movePieceToMouse(100, &pieceOnMouse, board, &pieceLastPos, &turn,boardX,boardY,castlingRights,fxMove,fxCapture);
+        if (!gameOver && promotionFile == -1) promotionFile = movePieceToMouse(100, &pieceOnMouse, board, &pieceLastPos, &turn,boardX,boardY,castlingRights,fxMove,fxCapture);
+        
 
-        if (isBlackMated(board,castlingRights) && !gameOver) {
+        if (isBlackMated(board,castlingRights) && !gameOver && pieceOnMouse == ' ') {
             std::cout << "White won by checkmate" << std::endl;
             gameOver = true;
         }
-        else if (isWhiteMated(board, castlingRights) && !gameOver) {
+        else if (isWhiteMated(board, castlingRights) && !gameOver && pieceOnMouse == ' ') {
             std::cout << "Black won by checkmate" << std::endl;
             gameOver = true;
         }
-        else if (isDrawByMaterial(board) && !gameOver) {
+        else if (isDrawByMaterial(board) && !gameOver && pieceOnMouse == ' ') {
             std::cout << "Draw by insufficient material" << std::endl;
             gameOver = true;
         }

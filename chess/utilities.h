@@ -8,7 +8,7 @@
 std::pair<int, int> getMousePosition(int cellLength, int boardX, int boardY);
 
 // function handle when user try's to move a piece
-void movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos,bool* turn,int boardX,int boardY,bool castlingRights[4],Sound fxMove,Sound fxCapture);
+int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos,bool* turn,int boardX,int boardY,bool castlingRights[4],Sound fxMove,Sound fxCapture);
 
 // function to return if the position of the mouse is valid or invalid
 bool isMousePositionValid(int screenWidth, int screenHeight,char *pieceOnMouse);
@@ -75,3 +75,12 @@ void copyBoard(char copyToboard[8][8], char copiedBoard[8][8]);
 
 // calculate the difference between two board (value wise)
 int calcBoardDiff(char boardOne[8][8], char boardTwo[8][8]);
+
+// a function to play sound to a certain move that is being played
+void playSoundMove(bool isLastPosMousePos, char boardAfter[8][8], std::pair<int, int>* pieceLastPos, char board[8][8], char* pieceOnMouse, Sound fxMove, Sound fxCapture);
+
+// handle castling rights and move of the rook when castling
+void handleCastling(char* pieceOnMouse, std::pair<int, int>* pieceLastPos, int mousePosX, bool castlingRights[4], char board[8][8]);
+
+// handle promotion of pawns
+int handlePromotion(char piece, int x, char board[8][8], int boardX, int boardY, int cellLength);

@@ -170,10 +170,6 @@ void renderBorder(int cellLength, int boardX, int boardY,Font* font) {
 void renderPieceLastPos(int x, int y, int cellLength, char type, Texture2D* pieces, char board[8][8], int boardX, int boardY) {
 	// a list of offsets for the textures
 
-	Vector2 offSetOne = { float(x) * cellLength + 15 + boardX,float(y) * cellLength + 5 + boardY };
-	Vector2 offSetTwo = { float(x) * cellLength + boardX,float(y) * cellLength + 5 + boardY };
-	Vector2 offSetThree = { float(x) * cellLength + 5 + boardX,float(y) * cellLength + 5 + boardY };
-
 	if (type == 'p') { // if the type is black pawn
 		DrawTextureRec(*pieces, Rectangle{ 460,90,90,90 }, OFFSET1, WEAKWHITE);
 	}
@@ -209,5 +205,30 @@ void renderPieceLastPos(int x, int y, int cellLength, char type, Texture2D* piec
 	}
 	else if (type == 'k') { // if the type is black king
 		DrawTextureRec(*pieces, Rectangle{ 0,90,90,90 }, OFFSET6, WEAKWHITE);
+	}
+}
+
+void renderPromotion(int boardX, int boardY, int cellLength, Texture2D* pieces, int x, char piece) {
+	int y = 0;
+	if (isUpperCase(piece)) {
+		DrawRectangle(float(x) * cellLength + boardX, float(y) * cellLength + boardY, cellLength, cellLength * 4,GRAY);
+		DrawTextureRec(*pieces, Rectangle{ 85,0,90,90 }, Vector2{float(boardX) + cellLength * x,float(boardY)+5 + cellLength*y}, WHITE);
+		y = 1;
+		DrawTextureRec(*pieces, Rectangle{ 360,0,90,90 }, Vector2{ float(boardX) + 5 + cellLength * x,float(boardY) + 5 + cellLength * y }, WHITE);
+		y = 2;
+		DrawTextureRec(*pieces, Rectangle{ 180,0,90,90 }, Vector2{ float(boardX) + 5 + cellLength * x,float(boardY) + 5 + cellLength * y }, WHITE);
+		y = 3;
+		DrawTextureRec(*pieces, Rectangle{ 270,0,90,90 }, Vector2{ float(boardX) + 5 + cellLength * x,float(boardY) + 5 + cellLength * y }, WHITE);
+	}
+	else if (isLowerCase(piece)) {
+		y = 4;
+		DrawRectangle(float(x) * cellLength + boardX, float(y) * cellLength + boardY, cellLength, cellLength * 4, GRAY);
+		DrawTextureRec(*pieces, Rectangle{ 265,90,90,90 }, Vector2{ float(boardX) + cellLength * x,float(boardY) + 5 + cellLength * y }, WHITE);
+		y = 5;
+		DrawTextureRec(*pieces, Rectangle{ 180,90,90,90 }, Vector2{ float(boardX) + 5 + cellLength * x,float(boardY) + 5 + cellLength * y }, WHITE);
+		y = 6;
+		DrawTextureRec(*pieces, Rectangle{ 360,90,90,90 }, Vector2{ float(boardX) + 5 + cellLength * x,float(boardY) + 5 + cellLength * y }, WHITE);
+		y = 7;
+		DrawTextureRec(*pieces, Rectangle{ 90,90,90,90 }, Vector2{ float(boardX) + 5 + cellLength * x,float(boardY) + 5 + cellLength * y }, WHITE);
 	}
 }
