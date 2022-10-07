@@ -44,3 +44,4 @@ the dependencies of this project are :
 * setup - folder containing setup vs project
 * README.md - readme file
 * chess.sln - Visual Studio solution file
+* setup.msi - setup file to download the program

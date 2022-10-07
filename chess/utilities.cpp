@@ -34,85 +34,85 @@ std::pair<int, int> getMousePosition(int cellLength,int boardX,int boardY) {
 	}
 	return position;
 }
-void movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos, bool* turn,int boardX,int boardY, bool castlingRights[4], Sound fxMove, Sound fxCapture) {
-	bool isPieceOnMouse = (*pieceOnMouse != ' '); // check if there is a piece on the mouse
-	char boardAfter[8][8];
-	bool isMoveVal = isMoveValid(*pieceOnMouse, *pieceLastPos, std::make_pair(getMousePosition(cellLength, boardX, boardY).second, getMousePosition(cellLength, boardX, boardY).first), board,castlingRights);
+int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos, bool* turn,int boardX,int boardY, bool castlingRights[4], Sound fxMove, Sound fxCapture) {
+	// check if there is a piece on the mouse
+	bool isPieceOnMouse = (*pieceOnMouse != ' '); 
+	
+	// coordinates of the mouse on the board
+	int mousePosX = getMousePosition(cellLength, boardX, boardY).first;
+	int mousePosY = getMousePosition(cellLength, boardX, boardY).second;
+	int promotionFile = -1;
+
+	// common conditions to clean up the code
+	bool isMoveVal = isMoveValid(*pieceOnMouse, *pieceLastPos, std::make_pair(mousePosY, mousePosX), board,castlingRights);
+	bool isLastPosMousePos = pieceLastPos->first != mousePosY || pieceLastPos->second != mousePosX;
 	bool isMousePosValid = isMousePositionValid(GetScreenWidth(), GetScreenHeight(), pieceOnMouse);
-	char cellOnMouse = board[getMousePosition(cellLength, boardX, boardY).second][getMousePosition(cellLength, boardX, boardY).first];
+	bool isTurnValid = (isLowerCase(*pieceOnMouse) && !*turn) || (isUpperCase(*pieceOnMouse) && *turn);
+
+	// check if the left button is up
+	bool isLeftUp = IsMouseButtonUp(MOUSE_BUTTON_LEFT);
+
+	// char variables
+	char cellOnMouse = board[mousePosY][mousePosX];
+	char boardAfter[8][8];
+
+	// make a board after a certain move
 	copyBoard(boardAfter, board);
-	boardAfter[getMousePosition(cellLength,boardX,boardY).second][getMousePosition(cellLength, boardX, boardY).first] = *pieceOnMouse;
+	boardAfter[mousePosY][mousePosX] = *pieceOnMouse;
+
+	// check if someone is checked
+	bool isChecked = isSideChecked(*pieceOnMouse, boardAfter, castlingRights);
+
 	// this if statement is for loading a piece to the mouse
-	if (!isPieceOnMouse && cellOnMouse != ' ' && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && // if the player clicks the left button on the mouse
+	if (!isPieceOnMouse && cellOnMouse != ' ' && 
+		IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && 
 		((*turn && isUpperCase(cellOnMouse) ) || 
 	     (!*turn && isLowerCase(cellOnMouse)))) {
 
 		*pieceOnMouse = cellOnMouse;
-		board[getMousePosition(cellLength, boardX, boardY).second][getMousePosition(cellLength, boardX, boardY).first] = ' ';
-		*pieceLastPos = std::make_pair(getMousePosition(cellLength, boardX, boardY).second, getMousePosition(cellLength, boardX, boardY).first);
+
+		board[mousePosY][mousePosX] = ' ';
+
+		*pieceLastPos = std::make_pair(mousePosY, mousePosX);
 	}
 	// this if statement is for unloading a piece from the mouse
-	else if (isPieceOnMouse && IsMouseButtonUp(MOUSE_BUTTON_LEFT) && isMousePosValid
-		&& isMoveVal && (!isSideChecked(*pieceOnMouse, boardAfter,castlingRights) || (getMousePosition(cellLength, boardX, boardY).second == pieceLastPos->first && getMousePosition(cellLength, boardX, boardY).first == pieceLastPos->second)) &&
-		((isLowerCase(*pieceOnMouse) && *turn == false) || (isUpperCase(*pieceOnMouse) && *turn == true))) {
+	else if (isPieceOnMouse && 
+			 IsMouseButtonUp(MOUSE_BUTTON_LEFT) && 
+			 isMousePosValid && isMoveVal && 
+			 (!isChecked || (mousePosY == pieceLastPos->first && mousePosX == pieceLastPos->second)) &&
+		     isTurnValid) {
 
-		boardAfter[pieceLastPos->first][pieceLastPos->second] = ' ';
-		char newBoard[8][8];
-		copyBoard(newBoard, board);
-		newBoard[pieceLastPos->first][pieceLastPos->second] = *pieceOnMouse;
-		if (calcBoardDiff(newBoard, boardAfter) != 0) {
+		if (mousePosY == 0 && *pieceOnMouse == 'P')  promotionFile = mousePosX;
+		if (mousePosY == 7 && *pieceOnMouse == 'p')  promotionFile = mousePosX;
 
-			PlaySound(fxCapture);
-		}
-		else {
-			PlaySound(fxMove);
-		}
+		playSoundMove(isLastPosMousePos, boardAfter, pieceLastPos, board, pieceOnMouse, fxMove, fxCapture);
 
-		if ((*pieceOnMouse == 'K' && pieceLastPos->second + 2 == getMousePosition(cellLength, boardX, boardY).first)) {
-			castlingRights[0] = false;
-			castlingRights[1] = false;
-			board[7][5] = 'R';
-			board[7][7] = ' ';
-		}
-		else if ((*pieceOnMouse == 'K' && pieceLastPos->second - 2 == getMousePosition(cellLength, boardX, boardY).first)) {
-			castlingRights[0] = false;
-			castlingRights[1] = false;
-			board[7][0] = ' ';
-			board[7][3] = 'R';
-		}else if ((*pieceOnMouse == 'k' && pieceLastPos->second + 2 == getMousePosition(cellLength, boardX, boardY).first)) {
-			castlingRights[2] = false;
-			castlingRights[3] = false;
-			board[0][5] = 'r';
-			board[0][7] = ' ';
-		}
-		else if ((*pieceOnMouse == 'k' && pieceLastPos->second - 2 == getMousePosition(cellLength, boardX, boardY).first)) {
-			castlingRights[2] = false;
-			castlingRights[3] = false;
-			board[0][0] = ' ';
-			board[0][3] = 'r';
-		}
-		board[getMousePosition(cellLength, boardX, boardY).second][getMousePosition(cellLength, boardX, boardY).first] = *pieceOnMouse;
+		handleCastling(pieceOnMouse, pieceLastPos, mousePosX, castlingRights, board);
+
+		board[mousePosY][mousePosX] = *pieceOnMouse;
+
 		*pieceOnMouse = ' ';
-		if (getMousePosition(cellLength, boardX, boardY).second != pieceLastPos->first || getMousePosition(cellLength, boardX, boardY).first != pieceLastPos->second) {
-			*turn = !(*turn);
-		}
-		
+		if (mousePosY != pieceLastPos->first || mousePosX != pieceLastPos->second) *turn = !(*turn);
 	}
 	// put the piece back to it's place if it's out of screen boundries
-	else if (isPieceOnMouse && IsMouseButtonUp(MOUSE_BUTTON_LEFT) && !isMousePosValid) {
+	else if (isPieceOnMouse && isLeftUp && !isMousePosValid) {
 		board[(*pieceLastPos).first][(*pieceLastPos).second] = *pieceOnMouse;
+
 		*pieceOnMouse = ' ';
 	}
 	// put the piece back to it's place if it's not valid
-	else if (isPieceOnMouse && IsMouseButtonUp(MOUSE_BUTTON_LEFT) && isMousePosValid && (!isMoveVal || isSideChecked(*pieceOnMouse, boardAfter,castlingRights))) {
+	else if (isPieceOnMouse && isLeftUp && isMousePosValid && (!isMoveVal || isChecked)) {
 		board[(*pieceLastPos).first][(*pieceLastPos).second] = *pieceOnMouse;
+
 		*pieceOnMouse = ' ';
 	}
 	// put the piece back to it's place if it's not the side's turn
-	else if (isPieceOnMouse && IsMouseButtonUp(MOUSE_BUTTON_LEFT) && (!(isLowerCase(*pieceOnMouse) && *turn == false) || !(isUpperCase(*pieceOnMouse) && *turn == true))) {
+	else if (isPieceOnMouse && isLeftUp && !isTurnValid) {
 		board[(*pieceLastPos).first][(*pieceLastPos).second] = *pieceOnMouse;
+
 		*pieceOnMouse = ' ';
 	}
+	return promotionFile;
 
 }
 bool isMousePositionValid(int screenWidth, int screenHeight, char* pieceOnMouse) {
@@ -143,7 +143,6 @@ void printBoard(char board[8][8]) {
 	}
 }
 bool isMoveValid(char piece, std::pair<int, int> pieceLastPos, std::pair<int, int> pieceNewPos, char lastBoard[8][8], bool castlingRights[4]) {
-	// second is x, first is y
 	std::map<char, bool> isValid = { {'P',Pawn::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'p',Pawn::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'R',Rook::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard)},
@@ -494,3 +493,82 @@ int calcBoardDiff(char boardOne[8][8], char boardTwo[8][8]) {
 	}
 	return abs(boardOneSum - boardTwoSum);
 }
+
+void playSoundMove(bool isLastPosMousePos, char boardAfter[8][8],std::pair<int,int>* pieceLastPos,char board[8][8],char* pieceOnMouse, Sound fxMove, Sound fxCapture) {
+	boardAfter[pieceLastPos->first][pieceLastPos->second] = ' ';
+	char newBoard[8][8];
+	copyBoard(newBoard, board);
+	newBoard[pieceLastPos->first][pieceLastPos->second] = *pieceOnMouse;
+
+	// if statement to play a sound if a piece was captured
+	if (calcBoardDiff(newBoard, boardAfter) != 0 && isLastPosMousePos) {
+		PlaySound(fxCapture);
+	}
+	// else if statement to play sound if a piece was moved
+	else if (isLastPosMousePos) {
+		PlaySound(fxMove);
+	}
+}
+
+void handleCastling(char* pieceOnMouse, std::pair<int, int>* pieceLastPos, int mousePosX, bool castlingRights[4], char board[8][8]) {
+	// if white castles king side
+	if ((*pieceOnMouse == 'K' && pieceLastPos->second + 2 == mousePosX)) {
+		castlingRights[0] = false;
+		castlingRights[1] = false;
+		board[7][5] = 'R';
+		board[7][7] = ' ';
+	}
+	// else if white castles queen side
+	else if ((*pieceOnMouse == 'K' && pieceLastPos->second - 2 == mousePosX)) {
+		castlingRights[0] = false;
+		castlingRights[1] = false;
+		board[7][0] = ' ';
+		board[7][3] = 'R';
+		// else if black castles king side
+	}
+	else if ((*pieceOnMouse == 'k' && pieceLastPos->second + 2 == mousePosX)) {
+		castlingRights[2] = false;
+		castlingRights[3] = false;
+		board[0][5] = 'r';
+		board[0][7] = ' ';
+	}// else if black castles queen side
+	else if ((*pieceOnMouse == 'k' && pieceLastPos->second - 2 == mousePosX)) {
+		castlingRights[2] = false;
+		castlingRights[3] = false;
+		board[0][0] = ' ';
+		board[0][3] = 'r';
+	}
+	else if (*pieceOnMouse == 'K') {
+		castlingRights[0] = false;
+		castlingRights[1] = false;
+	}
+	else if (*pieceOnMouse == 'k') {
+		castlingRights[2] = false;
+		castlingRights[3] = false;
+	}
+}
+int handlePromotion(char piece, int x, char board[8][8],int boardX,int boardY,int cellLength) {
+	int rank = x;
+	int file = -1;
+
+	int mousePosX = getMousePosition(cellLength, boardX, boardY).first;
+	int mousePosY = getMousePosition(cellLength, boardX, boardY).second;
+
+	if (isUpperCase(piece)) file = 0;
+	else if (isLowerCase(piece)) file = 7;
+
+	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && mousePosX == rank) {
+		if (mousePosY == 7 && isLowerCase(piece)) board[file][rank] = 'q';
+		if (mousePosY == 6 && isLowerCase(piece)) board[file][rank] = 'r';
+		if (mousePosY == 5 && isLowerCase(piece)) board[file][rank] = 'b';
+		if (mousePosY == 4 && isLowerCase(piece)) board[file][rank] = 'n';
+		if (mousePosY == 3 && isUpperCase(piece)) board[file][rank] = 'N';
+		if (mousePosY == 2 && isUpperCase(piece)) board[file][rank] = 'B';
+		if (mousePosY == 1 && isUpperCase(piece)) board[file][rank] = 'R';
+		if (mousePosY == 0 && isUpperCase(piece)) board[file][rank] = 'Q';
+	}
+	if (board[file][rank] != 'p' && board[file][rank] != 'P') return -1;
+
+	return x;
+}
+

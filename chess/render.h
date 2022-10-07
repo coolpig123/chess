@@ -22,3 +22,6 @@ void renderBorder(int cellLength, int boardX, int boardY, Font* font);
 
 // render last position of the piece on the mouse
 void renderPieceLastPos(int x, int y, int cellLength, char type, Texture2D* pieces, char board[8][8], int boardX, int boardY);
+
+// render pawn promotion options
+void renderPromotion(int boardX,int boardY,int cellLength,Texture2D* pieces,int x,char piece);
