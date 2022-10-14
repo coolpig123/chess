@@ -15,6 +15,7 @@
 ## features
 * **drag** **and** **drop** mechanism for moving pieces
 * **castling** queen and king side
+* **pawn promotion** implemented
 * utility function to read **FEN** **notation**
 * files and ranks displayed
 * Written in plain **C++** code (C++20) using camelCase notation
