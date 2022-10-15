@@ -34,7 +34,7 @@ std::pair<int, int> getMousePosition(int cellLength,int boardX,int boardY) {
 	}
 	return position;
 }
-int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos, bool* turn,int boardX,int boardY, bool castlingRights[4], Sound fxMove, Sound fxCapture) {
+int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos, bool* turn,int boardX,int boardY, bool castlingRights[4], Sound fxMove, Sound fxCapture, std::pair<int,int> lastMove[2]) {
 	// check if there is a piece on the mouse
 	bool isPieceOnMouse = (*pieceOnMouse != ' '); 
 	
@@ -44,7 +44,7 @@ int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::
 	int promotionFile = -1;
 
 	// common conditions to clean up the code
-	bool isMoveVal = isMoveValid(*pieceOnMouse, *pieceLastPos, std::make_pair(mousePosY, mousePosX), board,castlingRights);
+	bool isMoveVal = isMoveValid(*pieceOnMouse, *pieceLastPos, std::make_pair(mousePosY, mousePosX), board,castlingRights,lastMove);
 	bool isLastPosMousePos = pieceLastPos->first != mousePosY || pieceLastPos->second != mousePosX;
 	bool isMousePosValid = isMousePositionValid(GetScreenWidth(), GetScreenHeight(), pieceOnMouse);
 	bool isTurnValid = (isLowerCase(*pieceOnMouse) && !*turn) || (isUpperCase(*pieceOnMouse) && *turn);
@@ -60,8 +60,10 @@ int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::
 	copyBoard(boardAfter, board);
 	boardAfter[mousePosY][mousePosX] = *pieceOnMouse;
 
+	int lastMoveYDiff = abs(lastMove[0].first - lastMove[1].first);
+
 	// check if someone is checked
-	bool isChecked = isSideChecked(*pieceOnMouse, boardAfter, castlingRights);
+	bool isChecked = isSideChecked(*pieceOnMouse, boardAfter, castlingRights,lastMove);
 
 	// this if statement is for loading a piece to the mouse
 	if (!isPieceOnMouse && cellOnMouse != ' ' && 
@@ -81,6 +83,12 @@ int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::
 			 isMousePosValid && isMoveVal && 
 			 (!isChecked || (mousePosY == pieceLastPos->first && mousePosX == pieceLastPos->second)) &&
 		     isTurnValid) {
+
+		if (lastMove[1].first - 1 == mousePosY && board[lastMove[1].first][lastMove[1].second] == 'p' && lastMoveYDiff == 2) board[lastMove[1].first][lastMove[1].second] = ' ';
+		if (lastMove[1].first + 1 == mousePosY && board[lastMove[1].first][lastMove[1].second] == 'P' && lastMoveYDiff == 2) board[lastMove[1].first][lastMove[1].second] = ' ';
+
+		lastMove[0] = *pieceLastPos;
+		lastMove[1] = std::make_pair(mousePosY,mousePosX);
 
 		if (mousePosY == 0 && *pieceOnMouse == 'P')  promotionFile = mousePosX;
 		if (mousePosY == 7 && *pieceOnMouse == 'p')  promotionFile = mousePosX;
@@ -142,17 +150,17 @@ void printBoard(char board[8][8]) {
 		std::cout << "-----------------" << std::endl;
 	}
 }
-bool isMoveValid(char piece, std::pair<int, int> pieceLastPos, std::pair<int, int> pieceNewPos, char lastBoard[8][8], bool castlingRights[4]) {
-	std::map<char, bool> isValid = { {'P',Pawn::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard)},
-									 {'p',Pawn::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard)},
+bool isMoveValid(char piece, std::pair<int, int> pieceLastPos, std::pair<int, int> pieceNewPos, char lastBoard[8][8], bool castlingRights[4], std::pair<int, int> lastMove[2]) {
+	std::map<char, bool> isValid = { {'P',Pawn::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard,lastMove)},
+									 {'p',Pawn::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard,lastMove)},
 									 {'R',Rook::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'r',Rook::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'B',Bishop::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'b',Bishop::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'Q',Queen::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'q',Queen::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard)},
-									 {'K',King::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard,castlingRights)},
-									 {'k',King::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard,castlingRights)},
+									 {'K',King::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard,castlingRights,lastMove)},
+									 {'k',King::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard,castlingRights,lastMove)},
 									 {'N',Knight::isMoveValid(1, pieceLastPos, pieceNewPos, lastBoard)},
 									 {'n',Knight::isMoveValid(0, pieceLastPos, pieceNewPos, lastBoard)},
 	};
@@ -230,7 +238,7 @@ bool isDiagonalEmpty(std::pair<int, int> pieceLastPos, std::pair<int, int> piece
 	}
 	return true;
 }
-bool isKChecked(char board[8][8],bool castlingRights[4]) {
+bool isKChecked(char board[8][8],bool castlingRights[4], std::pair<int,int> lastMove[2]) {
 	std::pair<int, int> kingPos;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -242,7 +250,7 @@ bool isKChecked(char board[8][8],bool castlingRights[4]) {
 	}
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (isLowerCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board, castlingRights)) {
+			if (isLowerCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board, castlingRights,lastMove)) {
 				return true;
 			}
 		}
@@ -250,7 +258,7 @@ bool isKChecked(char board[8][8],bool castlingRights[4]) {
 	return false;
 }
 
-bool iskChecked(char board[8][8],bool castlingRights[4]) {
+bool iskChecked(char board[8][8],bool castlingRights[4], std::pair<int,int> lastMove[2]) {
 	std::pair<int, int> kingPos;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -262,23 +270,23 @@ bool iskChecked(char board[8][8],bool castlingRights[4]) {
 	}
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (isUpperCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board,castlingRights)) {
+			if (isUpperCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board,castlingRights,lastMove)) {
 				return true;
 			}
 		}
 	}
 	return false;
 }
-bool isSideChecked(char movedPiece, char board[8][8],bool castlingRights[4]) {
+bool isSideChecked(char movedPiece, char board[8][8],bool castlingRights[4], std::pair<int,int> lastMove[2]) {
 	if (isUpperCase(movedPiece)) {
-		if (isKChecked(board, castlingRights)) return true;
+		if (isKChecked(board, castlingRights,lastMove)) return true;
 	}
 	else {
-		if (iskChecked(board, castlingRights)) return true;
+		if (iskChecked(board, castlingRights,lastMove)) return true;
 	}
 	return false;
 }
-bool isKChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castlingRights[4]) {
+bool isKChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castlingRights[4], std::pair<int,int> lastMove[2]) {
 	std::pair<int, int> kingPos;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -290,7 +298,7 @@ bool isKChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castl
 	}
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (isLowerCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board,castlingRights)) {
+			if (isLowerCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board,castlingRights,lastMove)) {
 				checkingPiece->first = i;
 				checkingPiece->second = j;
 				return true;
@@ -299,7 +307,7 @@ bool isKChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castl
 	}
 	return false;
 }
-bool iskChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castlingRights[4]) {
+bool iskChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castlingRights[4], std::pair<int,int> lastMove[2]) {
 	std::pair<int, int> kingPos;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -311,7 +319,7 @@ bool iskChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castl
 	}
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (isUpperCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board,castlingRights)) {
+			if (isUpperCase(board[i][j]) && isMoveValid(board[i][j], std::make_pair(i, j), kingPos, board,castlingRights,lastMove)) {
 				checkingPiece->first = i;
 				checkingPiece->second = j;
 				return true;
@@ -320,9 +328,9 @@ bool iskChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castl
 	}
 	return false;
 }
-bool isBlackMated(char board[8][8], bool castlingRights[4]) {
+bool isBlackMated(char board[8][8], bool castlingRights[4],std::pair<int,int> lastMove[2]) {
 	char boardAfter[8][8];
-	if (!iskChecked(board,castlingRights)) return false;
+	if (!iskChecked(board,castlingRights,lastMove)) return false;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			if (isLowerCase(board[i][j])) {
@@ -331,8 +339,8 @@ bool isBlackMated(char board[8][8], bool castlingRights[4]) {
 						copyBoard(boardAfter, board);
 						boardAfter[a][b] = board[i][j];
 						boardAfter[i][j] = ' ';
-						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights) && 
-							!iskChecked(boardAfter, castlingRights)) {
+						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights,lastMove) && 
+							!iskChecked(boardAfter, castlingRights,lastMove)) {
 							return false;
 						}
 					}
@@ -342,9 +350,9 @@ bool isBlackMated(char board[8][8], bool castlingRights[4]) {
 	}
 	return true;
 }
-bool isWhiteMated(char board[8][8],bool castlingRights[4]) {
+bool isWhiteMated(char board[8][8],bool castlingRights[4], std::pair<int,int> lastMove[2]) {
 	char boardAfter[8][8];
-	if (!isKChecked(board, castlingRights)) return false;
+	if (!isKChecked(board, castlingRights,lastMove)) return false;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			if (isUpperCase(board[i][j])) {
@@ -353,8 +361,8 @@ bool isWhiteMated(char board[8][8],bool castlingRights[4]) {
 						copyBoard(boardAfter, board);
 						boardAfter[a][b] = board[i][j];
 						boardAfter[i][j] = ' ';
-						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights) && 
-							!isKChecked(boardAfter, castlingRights)) {
+						if (isMoveValid(board[i][j], std::make_pair(i, j), std::make_pair(a, b), board,castlingRights,lastMove) && 
+							!isKChecked(boardAfter, castlingRights,lastMove)) {
 							return false;
 						}
 					}
@@ -469,7 +477,7 @@ bool isDrawByMaterial(char board[8][8]) {
 	return false;
 }
 
-bool isDrawByStaleMate(char board[8][8]) {
+bool isDrawByStaleMate(char board[8][8], bool castlingRights[4]) {
 	return true;
 }
 
@@ -571,4 +579,3 @@ int handlePromotion(char piece, int x, char board[8][8],int boardX,int boardY,in
 
 	return x;
 }
-

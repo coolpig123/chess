@@ -14,18 +14,21 @@ void game::start() {
     bool turn = 1; // 1 for white, 0 for black
     bool gameOver = false;
     std::pair<int, int> pieceLastPos;
+    std::pair<int,int> lastMove[2] = {std::make_pair(-1,-1),std::make_pair(-1,-1) };
+
     // castlingRights[0] = can white castle king side
     // castlingRights[1] = can white castle queen side
     // castlingRights[2] = can black castle king side
     // castlingRights[3] = can black castle queen side
     bool castlingRights[] = {true,true,true,true};
+
     InitWindow(screenWidth, screenHeight, "chess");
     InitAudioDevice();
     Sound fxMove = LoadSound("../assets/move.mp3");         
     Sound fxCapture = LoadSound("../assets/capture.mp3");
     Texture2D pieces = LoadTexture("../assets/pieces.png");
     Font font = LoadFontEx("font.ttf", 640, 0, 79);
-    SetTargetFPS(144);               
+    //SetTargetFPS(144);               
     char board[8][8] = { {'r','n','b','q','k','b','n','r'},
                         {'p','p','p','p','p','p','p','p'},
                         {' ',' ',' ',' ',' ',' ',' ',' '},
@@ -44,13 +47,13 @@ void game::start() {
             renderBoard(boardX, boardY, 100);
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
-                    renderPiece(j , i, 100, board[i][j], &pieces,board,boardX,boardY, castlingRights);
+                    renderPiece(j , i, 100, board[i][j], &pieces,board,boardX,boardY, castlingRights,lastMove);
                 }
             }
             renderBorder(100, boardX, boardY,&font);
-            renderMousePosition(100, boardX, boardY);
             if (promotionFile == -1) {
-                renderPossibleMoves(pieceLastPos, pieceOnMouse, board, 100, boardX, boardY, pieceOnMouse, castlingRights);
+                renderMousePosition(100, boardX, boardY);
+                renderPossibleMoves(pieceLastPos, pieceOnMouse, board, 100, boardX, boardY, pieceOnMouse, castlingRights,lastMove);
                 renderPieceOnMouse(100, pieceOnMouse, &pieces);
                 renderPieceLastPos(pieceLastPos.second, pieceLastPos.first, 100, pieceOnMouse, &pieces, board, boardX, boardY);
             }
@@ -63,17 +66,19 @@ void game::start() {
                     renderPromotion(boardX, boardY, 100, &pieces, promotionFile, 'p');
                     promotionFile = handlePromotion('p', promotionFile, board, boardX, boardY, 100);
                 }
+                renderMousePosition(100, boardX, boardY);
             }
+            
         EndDrawing();
 
-        if (!gameOver && promotionFile == -1) promotionFile = movePieceToMouse(100, &pieceOnMouse, board, &pieceLastPos, &turn,boardX,boardY,castlingRights,fxMove,fxCapture);
+        if (!gameOver && promotionFile == -1) promotionFile = movePieceToMouse(100, &pieceOnMouse, board, &pieceLastPos, &turn,boardX,boardY,castlingRights,fxMove,fxCapture,lastMove);
         
 
-        if (isBlackMated(board,castlingRights) && !gameOver && pieceOnMouse == ' ') {
+        if (isBlackMated(board,castlingRights,lastMove) && !gameOver && pieceOnMouse == ' ') {
             std::cout << "White won by checkmate" << std::endl;
             gameOver = true;
         }
-        else if (isWhiteMated(board, castlingRights) && !gameOver && pieceOnMouse == ' ') {
+        else if (isWhiteMated(board, castlingRights,lastMove) && !gameOver && pieceOnMouse == ' ') {
             std::cout << "Black won by checkmate" << std::endl;
             gameOver = true;
         }
@@ -81,6 +86,12 @@ void game::start() {
             std::cout << "Draw by insufficient material" << std::endl;
             gameOver = true;
         }
+        /*
+        else if (isDrawByStaleMate(board,castlingRights) && !gameOver && pieceOnMouse == ' ') {
+            std::cout << "Draw by stalemate" << std::endl;
+            gameOver = true;
+        }
+        */
     }
     CloseWindow();
     UnloadSound(fxMove);    

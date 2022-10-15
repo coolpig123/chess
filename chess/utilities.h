@@ -8,7 +8,7 @@
 std::pair<int, int> getMousePosition(int cellLength, int boardX, int boardY);
 
 // function handle when user try's to move a piece
-int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos,bool* turn,int boardX,int boardY,bool castlingRights[4],Sound fxMove,Sound fxCapture);
+int movePieceToMouse(int cellLength, char* pieceOnMouse, char board[8][8], std::pair<int, int>* pieceLastPos,bool* turn,int boardX,int boardY,bool castlingRights[4],Sound fxMove,Sound fxCapture,std::pair<int,int> lastMove[2]);
 
 // function to return if the position of the mouse is valid or invalid
 bool isMousePositionValid(int screenWidth, int screenHeight,char *pieceOnMouse);
@@ -17,7 +17,7 @@ bool isMousePositionValid(int screenWidth, int screenHeight,char *pieceOnMouse);
 void printBoard(char board[8][8]);
 
 // check if the move is valid
-bool isMoveValid(char piece, std::pair<int, int> pieceLastPos, std::pair<int, int> pieceNewPos, char lastBoard[8][8], bool castlingRights[4]);
+bool isMoveValid(char piece, std::pair<int, int> pieceLastPos, std::pair<int, int> pieceNewPos, char lastBoard[8][8], bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // check if a letter is upper case
 bool isUpperCase(char letter);
@@ -35,25 +35,25 @@ bool isColumnEmpty(int start, int end,int column, char board[8][8]);
 bool isDiagonalEmpty(std::pair<int, int> pieceLastPos, std::pair<int, int> pieceNewPos, char lastBoard[8][8]);
 
 // check if the white king is being checked
-bool isKChecked(char board[8][8],bool castlingRights[4]);
+bool isKChecked(char board[8][8],bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // check if the black king is being checked (with giving the checking piece)
-bool isKChecked(char board[8][8],std::pair<int,int>* checkingPiece, bool castlingRights[4]);
+bool isKChecked(char board[8][8],std::pair<int,int>* checkingPiece, bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // check if the black king is being checked
-bool iskChecked(char board[8][8], bool castlingRights[4]);
+bool iskChecked(char board[8][8], bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // check if the black king is being checked (with giving the checking piece)
-bool iskChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castlingRights[4]);
+bool iskChecked(char board[8][8], std::pair<int, int>* checkingPiece, bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // check if side is checked
-bool isSideChecked(char movedPiece, char board[8][8],bool castlingRights[4]);
+bool isSideChecked(char movedPiece, char board[8][8],bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // check if black is mated
-bool isBlackMated(char board[8][8], bool castlingRights[4]);
+bool isBlackMated(char board[8][8], bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // check if white is mated
-bool isWhiteMated(char board[8][8], bool castlingRights[4]);
+bool isWhiteMated(char board[8][8], bool castlingRights[4], std::pair<int,int> lastMove[2]);
 
 // read FEN notation and return a board containing the FEN
 void readFEN(std::string FEN, char board[8][8],bool* turn,bool castlingRights[4]);
@@ -68,7 +68,7 @@ bool isNumber(char character);
 bool isDrawByMaterial(char board[8][8]);
 
 // is there a draw by stalemate
-bool isDrawByStaleMate(char board[8][8]);
+bool isDrawByStaleMate(char board[8][8],bool castlingRights[4]);
 
 // copy board to another board
 void copyBoard(char copyToboard[8][8], char copiedBoard[8][8]);

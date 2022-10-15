@@ -25,57 +25,57 @@ void renderBoard(int x, int y, int cellLength) {
 	}
 }
 
-void renderPiece(int x, int y, int cellLength, char type, Texture2D* pieces,char board[8][8],int boardX, int boardY,bool castlingRights[4]) {
-	if (type == 'p') { // if the type is black pawn
+void renderPiece(int x, int y, int cellLength, char type, Texture2D* pieces,char board[8][8],int boardX, int boardY,bool castlingRights[4], std::pair<int,int> lastMove[2]) {
+	switch (type) {
+	case 'p':
 		DrawTextureRec(*pieces, Rectangle{ 460,90,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'P') { // if the type is white pawn
+		break;
+	case 'P':
 		DrawTextureRec(*pieces, Rectangle{ 460,0,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'R') { // if the type is white rook
-		DrawTextureRec(*pieces, Rectangle{ 370,0,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'r') { // if the type is black rook
+		break;
+	case 'r':
 		DrawTextureRec(*pieces, Rectangle{ 370,90,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'N') { // if the type is white knight
-		DrawTextureRec(*pieces, Rectangle{ 280,0,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'n') { // if the type is black knight
+		break;
+	case 'R':
+		DrawTextureRec(*pieces, Rectangle{ 370,0,90,90 }, OFFSET1, WHITE);
+		break;
+	case 'n':
 		DrawTextureRec(*pieces, Rectangle{ 280,90,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'B') { // if the type is white bishop
-		DrawTextureRec(*pieces, Rectangle{ 190,0,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'b') { // if the type is black bishop
+		break;
+	case 'N':
+		DrawTextureRec(*pieces, Rectangle{ 280,0,90,90 }, OFFSET1, WHITE);
+		break;
+	case 'b':
 		DrawTextureRec(*pieces, Rectangle{ 190,90,90,90 }, OFFSET1, WHITE);
-	}
-	else if (type == 'Q') { // if the type is white queen
-		DrawTextureRec(*pieces, Rectangle{ 85,0,90,90 }, OFFSET2, WHITE);
-	}
-	else if (type == 'q') { // if the type is black queen
+		break;
+	case 'B':
+		DrawTextureRec(*pieces, Rectangle{ 190,0,90,90 }, OFFSET1, WHITE);
+		break;
+	case 'q':
 		DrawTextureRec(*pieces, Rectangle{ 85,90,90,90 }, OFFSET2, WHITE);
-	}
-	else if (type == 'K') { // if the type is white king
-		if (isKChecked(board, castlingRights) && (x + y) % 2 == 0) {
-			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0) , RED, Color{ 196,110,57,255 });
+		break;
+	case 'Q':
+		DrawTextureRec(*pieces, Rectangle{ 85,0,90,90 }, OFFSET2, WHITE);
+		break;
+	case 'k':
+		if (iskChecked(board, castlingRights,lastMove) && (x + y) % 2 == 0) {
+			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0), RED, Color{ 196,110,57,255 });
 		}
-		else if (isKChecked(board, castlingRights) && (x + y) % 2 != 0) {
-			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0) , RED, Color{ 238,202,161,255 });
+		else if (iskChecked(board, castlingRights,lastMove) && (x + y) % 2 != 0) {
+			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0), RED, Color{ 238,202,161,255 });
+		}
+		DrawTextureRec(*pieces, Rectangle{ 0,90,90,90 }, Vector2{ float(x) * cellLength + 5 + boardX ,float(y) * cellLength + 5 + boardY }, WHITE);
+		break;
+	case 'K':
+		if (isKChecked(board, castlingRights,lastMove) && (x + y) % 2 == 0) {
+			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0), RED, Color{ 196,110,57,255 });
+		}
+		else if (isKChecked(board, castlingRights,lastMove) && (x + y) % 2 != 0) {
+			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0), RED, Color{ 238,202,161,255 });
 		}
 		DrawTextureRec(*pieces, Rectangle{ 0,0,90,90 }, Vector2{ float(x) * cellLength + 5 + boardX,float(y) * cellLength + 5 + boardY }, WHITE);
 	}
-	else if (type == 'k') { // if the type is black king
-		if (iskChecked(board, castlingRights) && (x+y) % 2 == 0) {
-			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0), RED, Color{ 196,110,57,255 });
-		}
-		else if (iskChecked(board, castlingRights) && (x + y) % 2 != 0) {
-			DrawCircleGradient(x * cellLength + cellLength / 2 + boardX, y * cellLength + cellLength / 2 + boardY, cellLength / float(2.0), RED , Color{ 238,202,161,255 });
-		}
-		DrawTextureRec(*pieces, Rectangle{ 0,90,90,90 }, Vector2{ float(x) * cellLength + 5 + boardX ,float(y) * cellLength + 5  + boardY}, WHITE);
-	}
 }
-
 void renderMousePosition(int cellLength,int boardX,int boardY) {
 	std::pair<int, int> mousePosition = getMousePosition(cellLength, boardX, boardY);
 	if (GetMouseX() <= boardX + (cellLength * 8) && GetMouseY() <= boardY + (cellLength * 8) && GetMouseX() > boardX && GetMouseY() > boardY) {
@@ -83,46 +83,48 @@ void renderMousePosition(int cellLength,int boardX,int boardY) {
 	}
 }
 void renderPieceOnMouse(int cellLength, char type, Texture2D* pieces) {
-	if (type == 'p') { // if the type is black pawn
+	switch (type) {
+	case 'p' : 
 		DrawTextureRec(*pieces, Rectangle{ 460,90,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'P') { // if the type is white pawn
+		break;
+	case 'P' :
 		DrawTextureRec(*pieces, Rectangle{ 460,0,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'R') { // if the type is white rook
+		break;
+	case 'R' :
 		DrawTextureRec(*pieces, Rectangle{ 370,0,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'r') { // if the type is black rook
+		break;
+	case 'r' : 
 		DrawTextureRec(*pieces, Rectangle{ 370,90,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'N') { // if the type is white knight
+		break;
+	case 'N' : 
 		DrawTextureRec(*pieces, Rectangle{ 280,0,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'n') { // if the type is black knight
+		break;
+	case 'n' :
 		DrawTextureRec(*pieces, Rectangle{ 280,90,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'B') { // if the type is white bishop
+		break;
+	case 'B' : 
 		DrawTextureRec(*pieces, Rectangle{ 190,0,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'b') { // if the type is black bishop
+		break;
+	case 'b' :
 		DrawTextureRec(*pieces, Rectangle{ 190,90,90,90 }, OFFSET3, WHITE);
-	}
-	else if (type == 'Q') { // if the type is white queen
+		break;
+	case 'Q' : 
 		DrawTextureRec(*pieces, Rectangle{ 85,0,90,90 }, OFFSET4, WHITE);
-	}
-	else if (type == 'q') { // if the type is black queen
+		break;
+	case 'q' :
 		DrawTextureRec(*pieces, Rectangle{ 85,90,90,90 }, OFFSET4, WHITE);
-	}
-	else if (type == 'K') { // if the type is white king
+		break;
+	case 'K' : 
 		DrawTextureRec(*pieces, Rectangle{ 0,0,90,90 }, OFFSET5, WHITE);
-	}
-	else if (type == 'k') { // if the type is black king
+		break;
+	case 'k' : 
 		DrawTextureRec(*pieces, Rectangle{ 0,90,90,90 }, OFFSET5, WHITE);
+		break;
 	}
 }
 
 // a function to render the possible moves a piece can play
-void renderPossibleMoves(std::pair<int, int> position,char piece, char board[8][8],int cellLength, int boardX, int boardY,char pieceOnMouse,bool castlingRights[4]) {
+void renderPossibleMoves(std::pair<int, int> position,char piece, char board[8][8],int cellLength, int boardX, int boardY,char pieceOnMouse,bool castlingRights[4], std::pair<int,int> lastMove[2]) {
 	char boardCostom[8][8];
 	bool sideChecked;
 	for (int a = 0; a < 8; a++) {
@@ -140,14 +142,14 @@ void renderPossibleMoves(std::pair<int, int> position,char piece, char board[8][
 			copyBoard(boardAfter, boardCostom);
 			boardAfter[j][i] = boardAfter[position.first][position.second];
 			boardAfter[position.first][position.second] = ' ';
-			sideChecked = isSideChecked(piece, boardAfter, castlingRights);
+			sideChecked = isSideChecked(piece, boardAfter, castlingRights,lastMove);
 			// if the possible move is not a capture
-			if (isMoveValid(boardCostom[position.first][position.second], position, std::make_pair(j, i), boardCostom,castlingRights) && board[j][i] == ' ' && !sideChecked) {
+			if (isMoveValid(boardCostom[position.first][position.second], position, std::make_pair(j, i), boardCostom,castlingRights,lastMove) && board[j][i] == ' ' && !sideChecked) {
 
 				DrawCircle(i * cellLength + cellLength/ 2 + boardX, j * cellLength + cellLength / 2 + boardY, float(cellLength/7.0),Color{170,170,170,170});
 			}
 			// else if the possible move is a capture
-			else if (isMoveValid(boardCostom[position.first][position.second], position, std::make_pair(j, i), boardCostom,castlingRights) && board[j][i] != ' ' && !sideChecked) {
+			else if (isMoveValid(boardCostom[position.first][position.second], position, std::make_pair(j, i), boardCostom,castlingRights,lastMove) && board[j][i] != ' ' && !sideChecked) {
 
 				DrawRing(Vector2{ float(i * cellLength + cellLength * 0.5 + boardX) ,float(j * cellLength + cellLength * 0.5 + boardY) }, float(cellLength / 2.2), cellLength / float(2.0), 0, 360, 1, Color{ 170,170,170,170 });
 			}
@@ -168,43 +170,43 @@ void renderBorder(int cellLength, int boardX, int boardY,Font* font) {
 }
 
 void renderPieceLastPos(int x, int y, int cellLength, char type, Texture2D* pieces, char board[8][8], int boardX, int boardY) {
-	// a list of offsets for the textures
-
-	if (type == 'p') { // if the type is black pawn
+	switch (type) {
+	case 'p': 
 		DrawTextureRec(*pieces, Rectangle{ 460,90,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'P') { // if the type is white pawn
+		break;
+	case 'P': 
 		DrawTextureRec(*pieces, Rectangle{ 460,0,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'R') { // if the type is white rook
+		break;
+	case 'R': 
 		DrawTextureRec(*pieces, Rectangle{ 370,0,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'r') { // if the type is black rook
+		break;
+	case 'r':
 		DrawTextureRec(*pieces, Rectangle{ 370,90,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'N') { // if the type is white knight
+		break;
+	case 'N': 
 		DrawTextureRec(*pieces, Rectangle{ 280,0,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'n') { // if the type is black knight
+		break;
+	case 'n': 
 		DrawTextureRec(*pieces, Rectangle{ 280,90,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'B') { // if the type is white bishop
+		break;
+	case 'B': 
 		DrawTextureRec(*pieces, Rectangle{ 190,0,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'b') { // if the type is black bishop
+		break;
+	case 'b': 
 		DrawTextureRec(*pieces, Rectangle{ 190,90,90,90 }, OFFSET1, WEAKWHITE);
-	}
-	else if (type == 'Q') { // if the type is white queen
+		break;
+	case 'Q':
 		DrawTextureRec(*pieces, Rectangle{ 85,0,90,90 }, OFFSET2, WEAKWHITE);
-	}
-	else if (type == 'q') { // if the type is black queen
+		break;
+	case 'q': 
 		DrawTextureRec(*pieces, Rectangle{ 85,90,90,90 }, OFFSET2, WEAKWHITE);
-	}
-	else if (type == 'K') { // if the type is white king
+		break;
+	case 'K': 
 		DrawTextureRec(*pieces, Rectangle{ 0,0,90,90 }, OFFSET6, WEAKWHITE);
-	}
-	else if (type == 'k') { // if the type is black king
+		break;
+	case 'k':
 		DrawTextureRec(*pieces, Rectangle{ 0,90,90,90 }, OFFSET6, WEAKWHITE);
+		break;
 	}
 }
 
